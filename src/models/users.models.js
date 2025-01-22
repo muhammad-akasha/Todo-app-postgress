@@ -1,8 +1,9 @@
 import { DataTypes } from "sequelize";
+import bcrypt from "bcrypt";
 
 const createUserModel = (sequelize) => {
   const User = sequelize.define(
-    "User",
+    "users",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -32,6 +33,15 @@ const createUserModel = (sequelize) => {
             args: [6, 17],
             msg: "Password must be between 6 and 17 characters",
           },
+        },
+      },
+    },
+    {
+      hooks: {
+        beforeSave: async (user, options) => {
+          if (user.changed("password")) {
+            user.password = await bcrypt.hash(user.password, 10);
+          }
         },
       },
     },
