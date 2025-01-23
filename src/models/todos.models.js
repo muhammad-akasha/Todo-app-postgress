@@ -22,6 +22,15 @@ const createTodoModel = (sequelize) => {
         validate: {
           notEmpty: { msg: "Description cannot be empty" },
         },
+        userId: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: "users",
+            key: "id",
+          },
+          onDelete: "CASCADE",
+        },
       },
     },
     {

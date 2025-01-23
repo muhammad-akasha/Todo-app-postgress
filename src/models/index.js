@@ -12,6 +12,9 @@ const models = {};
 models.User = createUserModel(sequelize);
 models.Todo = createTodoModel(sequelize);
 
+models.User.hasMany(models.Todo, { foreignKey: "userId", as: "todos" });
+models.Todo.belongsTo(models.User, { foreignKey: "userId", as: "user" });
+
 sequelize
   .sync({ alter: true })
   .then(() => {

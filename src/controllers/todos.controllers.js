@@ -1,20 +1,43 @@
 import { models } from "../models/index.js";
 
 const allTodo = async (req, res) => {
-  const Todos = await models.Todo.findAll();
-  if (Todos.length === 0) {
-    return res.status(400).json({ message: "Please Add Todo First" });
+  const { id } = req.params; // Extracts the userId from the URL params
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ message: "Please create an account to add todos" });
   }
 
-  res.status(200).json({ Todos });
+  try {
+    const Todos = await models.Todo.findAll({
+      where: { userId: id },
+      include: {
+        model: models.User, // Include the associated User model
+        as: "user", // Use the alias defined in the association / relation
+        attributes: ["id", "fullname", "email"], // Specify which user attributes to return (you can customize this)
+      },
+    });
+
+    if (Todos.length === 0) {
+      return res.status(400).json({ message: "Please add todos first" });
+    }
+
+    res.status(200).json({ Todos });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching todos." });
+  }
 };
 
 const addTodo = async (req, res) => {
+  const { userId } = req.params;
   const { title, description } = req.body;
-  console.log(models);
 
   // Validate the input fields
-  if (!title || !description) {
+  if (!title || !description || !userId) {
     return res
       .status(400)
       .json({ error: "Title and description are required." });
@@ -25,6 +48,7 @@ const addTodo = async (req, res) => {
     const newTodo = await models.Todo.create({
       title,
       description,
+      userId,
     });
 
     // Respond with the created todo
@@ -41,7 +65,7 @@ const addTodo = async (req, res) => {
 };
 
 const updateTodo = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, id } = req.body;
   let obj = {};
   if (title) {
     obj.title = title;
@@ -51,7 +75,7 @@ const updateTodo = async (req, res) => {
   }
   await models.Todo.update(obj, {
     where: {
-      id: 1,
+      id,
     },
   });
   const todo = await models.Todo.findByPk(1);
@@ -63,22 +87,22 @@ const updateTodo = async (req, res) => {
 };
 
 const deleteTodo = async (req, res) => {
-  const userId = req.body.userId;
+  const id = req.body.todoId;
   try {
-    // Delete the user where the 'id' matches the given userId
+    // Delete the user where the 'id' matches the given todoId
     const result = await models.Todo.destroy({
       where: {
-        id: userId,
+        id,
       },
     });
 
     if (result === 0) {
-      res.status(400).json({ message: "No user found with the given ID." });
+      res.status(400).json({ message: "No Todo found with the given ID." });
     } else {
-      res.status(201).json({ message: "User deleted successfully." });
+      res.status(201).json({ message: "Todo deleted successfully." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error deleting user:", error });
+    res.status(500).json({ message: "Error deleting Todo:", error });
   }
 };
 

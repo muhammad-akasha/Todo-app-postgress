@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.get("/gettodos", allTodo);
-router.post("/addtodo", addTodo);
+router.post("/user/:id/getalltodo", allTodo);
+router.post("user/:id/addtodo", addTodo);
 router.delete("/deletetodo", deleteTodo);
 router.patch("/updatetodo", updateTodo);
 

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 const createUserModel = (sequelize) => {
   const User = sequelize.define(
-    "users",
+    "user",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -47,7 +47,7 @@ const createUserModel = (sequelize) => {
     },
     {
       timestamp: true,
-      tableName: "users",
+      tableName: "user",
     }
   );
 
