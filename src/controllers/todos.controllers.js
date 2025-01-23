@@ -1,7 +1,7 @@
 import { models } from "../models/index.js";
 
 const allTodo = async (req, res) => {
-  const { id } = req.params; // Extracts the userId from the URL params
+  const { id } = req.user.dataValues;
 
   if (!id) {
     return res
@@ -33,11 +33,11 @@ const allTodo = async (req, res) => {
 };
 
 const addTodo = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.user.dataValues; // Extracts the userId from the URL params
   const { title, description } = req.body;
 
   // Validate the input fields
-  if (!title || !description || !userId) {
+  if (!title || !description || !id) {
     return res
       .status(400)
       .json({ error: "Title and description are required." });
@@ -48,7 +48,7 @@ const addTodo = async (req, res) => {
     const newTodo = await models.Todo.create({
       title,
       description,
-      userId,
+      userId: id,
     });
 
     // Respond with the created todo
